@@ -41,7 +41,7 @@ socket.on('players', (players) => {
 })
 function Draw(players) {
     ctx.fillStyle = "#000"
-    // ctx.clearRect(0 ,0 ,500, 500)
+    ctx.clearRect(0 ,0 ,500, 500)
     for (var i = 0; i < players.length; i++) {
         for (var f = 0; f < players[i]['body'].length; f++) {
                 ctx.fillRect(
@@ -49,7 +49,7 @@ function Draw(players) {
                     players[i]['body'][f][1]*tileSize,
                     tileSize,
                     tileSize)
-                console.log(players[i]['body'][f][1]*tileSize)
+                
         }
             
     }

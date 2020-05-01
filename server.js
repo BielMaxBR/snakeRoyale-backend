@@ -48,6 +48,26 @@ function Snake(id) {
 
 function Update() {
     io.emit('players', players)
+    for (var i = 0; i < players.length;i++) {
+        // for (var f = 0; f < players[i]['body'].length;f++) {
+            var nextPos = [players[i]['body'][0][0] + players[i]['direction'][0],players[i]['body'][0][1] + players[i]['direction'][1]]
+            players[i]['body'].pop()
+            players[i]['body'].splice(0,0, nextPos)
+            if (players[i]['body'][0][0] < 0) {
+                    players[i]['body'][0][0] = 500/10
+                }
+                if (players[i]['body'][0][0] > 500/10+1) {
+                    players[i]['body'][0][0] = 0
+                }
+                if (players[i]['body'][0][1] < 0) {
+                    players[i]['body'][0][1] = 500/10
+                }
+                if (players[i]['body'][0][1] > 500/10+1) {
+                    players[i]['body'][0][1] = 0
+                }
+            console.log(players[i]['body'])
+        // }
+    }
     // console.log(players)
 }
 function run() {
@@ -55,6 +75,8 @@ function run() {
 
     setTimeout(run, (60/bpm)*1000)
 }
-
-run()
+function init() {
+    run()
+}
+init()
 server.listen(3000)
