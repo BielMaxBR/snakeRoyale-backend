@@ -7,15 +7,29 @@ var players = [], bpm = 600
 app.use(express.static(path.join(__dirname, "public")))
 
 io.on('connection', (socket) => {
-    socket.on("ready", () => {
-        CreatePlayer(socket.id)
-        console.log(players)
-        socket.emit('players',players)
-    })
+    // socket.on("ready", () => {
+    //     CreatePlayer(socket.id)
+    //     // console.log(players)
+    //     socket.emit('players',players)
+    // })
 
-    socket.on('PlayerMove', (player) => {
-        KeyInput(key, socket.id)
-        console.log(key)
+    socket.on('playerMove', (player) => {
+        if (players.length == 0) {
+            players.push(player)
+            // console.log(players)
+        }
+        else {
+            for (var i = 0;i < players.length; i++) {
+                if (players[i]['nick'] != player['nick']) {
+                    players.push(player)
+                    // console.log(players)
+                }
+                else {
+                    players[i] = player
+                    console.log(players[i]['direction'])
+                }
+            }
+        }
     })
 
     socket.on('disconnect', () => {
@@ -29,46 +43,34 @@ io.on('connection', (socket) => {
     })
 })
 
-function CreatePlayer(id) {
-    players.push(Snake(id))
+function CreatePlayer(player) {
+    players.push(player)
 }
 
 
-
-function Snake(id) {
-    this.body = [[10,10],[10,10],[10,10]]
-    this.direction = [0, -1]
-    this.id = id
-    
-    return { 
-        'id':this.id,
-        'body':this.body,
-        'direction':this.direction,
-    }
-}
 
 function Update() {
     io.emit('players', players)
-    for (var i = 0; i < players.length;i++) {
-        // for (var f = 0; f < players[i]['body'].length;f++) {
-            var nextPos = [players[i]['body'][0][0] + players[i]['direction'][0],players[i]['body'][0][1] + players[i]['direction'][1]]
-            players[i]['body'].pop()
-            players[i]['body'].splice(0,0, nextPos)
-            if (players[i]['body'][0][0] < 0) {
-                    players[i]['body'][0][0] = 500/10
-                }
-                if (players[i]['body'][0][0] > 500/10+1) {
-                    players[i]['body'][0][0] = 0
-                }
-                if (players[i]['body'][0][1] < 0) {
-                    players[i]['body'][0][1] = 500/10
-                }
-                if (players[i]['body'][0][1] > 500/10+1) {
-                    players[i]['body'][0][1] = 0
-                }
-            console.log(players[i]['body'])
+    // for (var i = 0; i < players.length;i++) {
+    //     // for (var f = 0; f < players[i]['body'].length;f++) {
+    //         var nextPos = [players[i]['body'][0][0] + players[i]['direction'][0],players[i]['body'][0][1] + players[i]['direction'][1]]
+    //         players[i]['body'].pop()
+    //         players[i]['body'].splice(0,0, nextPos)
+    //         if (players[i]['body'][0][0] < 0) {
+    //                 players[i]['body'][0][0] = 500/10
+    //             }
+    //             if (players[i]['body'][0][0] > 500/10+1) {
+    //                 players[i]['body'][0][0] = 0
+    //             }
+    //             if (players[i]['body'][0][1] < 0) {
+    //                 players[i]['body'][0][1] = 500/10
+    //             }
+    //             if (players[i]['body'][0][1] > 500/10+1) {
+    //                 players[i]['body'][0][1] = 0
+    //             }
+    //         console.log(players[i]['body'])
         // }
-    }
+    // }
     // console.log(players)
 }
 function run() {
