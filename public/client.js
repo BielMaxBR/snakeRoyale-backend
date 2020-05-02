@@ -1,10 +1,11 @@
 var online = false
 var socket = io()
+var bpm = 600
+
 $('form').submit(function(e) {
     e.preventDefault()
     if (!online) {
-            socket.emit("ready", () => {
-        });        
+            socket.emit("ready", ($('nick').val()))
         online = true
     }
     })
@@ -14,6 +15,24 @@ window.addEventListener("keydown", keyDown)
 function keyDown(e) {
     console.log(e.key)
     socket.emit("keyInput", e.key)
+
+}
+
+function KeyInput(key, id) {
+    for (var i = 0; i < players.length; i++) {
+        if(key == "ArrowUp"  && players[i]['id'] == id && players[i]['direction'].toString() != [0,1].toString()|| key.toLowerCase() == "w" && players[i]['id'] == id && players[i]['direction'].toString() != [0,1].toString()) {
+            players[i]['direction'] = [0, -1]      
+        }
+        if(key == "ArrowDown" && players[i]['id'] == id && players[i]['direction'].toString() != [0,-1].toString()|| key.toLowerCase() == "s" && players[i]['id'] == id && players[i]['direction'].toString() != [0,-1].toString()) {
+            players[i]['direction'] = [0, 1]
+        }
+        if(key == "ArrowLeft" && players[i]['id'] == id && players[i]['direction'].toString() != [1,0].toString()|| key.toLowerCase() == "a" && players[i]['id'] == id && players[i]['direction'].toString() != [1,0].toString()) {
+            players[i]['direction'] = [-1, 0]
+        }
+        if(key == "ArrowRight" && players[i]['id'] == id && players[i]['direction'].toString() != [-1,0].toString()|| key.toLowerCase() == "d" && players[i]['id'] == id && players[i]['direction'].toString() != [-1,0].toString()) {
+            players[i]['direction'] = [1, 0]
+        }
+    }
 }
 function init() {
     canvas = document.createElement("canvas")
@@ -23,7 +42,7 @@ function init() {
     
     // newGame()
     // frisk.update()
-    // run()
+    run()
 }
 
 function resizeWindow() {
@@ -54,5 +73,14 @@ function Draw(players) {
             
     }
  }
+
+function update() {
     
-    init()
+}
+ 
+function run() {
+    update()
+    setTimeout(run, 60/bpm*1000)
+}
+ 
+init()

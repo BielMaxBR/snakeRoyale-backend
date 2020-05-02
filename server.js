@@ -13,12 +13,12 @@ io.on('connection', (socket) => {
         socket.emit('players',players)
     })
 
-    socket.on('keyInput', (key) => {
+    socket.on('PlayerMove', (player) => {
         KeyInput(key, socket.id)
         console.log(key)
     })
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', () => {
             console.log('um jogador saiu da partida')
             for (var i = 0; i < players.length; i++) {
                 if(players[i]['id'] == socket.id) {
@@ -33,22 +33,7 @@ function CreatePlayer(id) {
     players.push(Snake(id))
 }
 
-function KeyInput(key, id) {
-    for (var i = 0; i < players.length; i++) {
-        if(key == "ArrowUp"  && players[i]['id'] == id && players[i]['direction'].toString() != [0,1].toString()|| key.toLowerCase() == "w" && players[i]['id'] == id && players[i]['direction'].toString() != [0,1].toString()) {
-            players[i]['direction'] = [0, -1]      
-        }
-        if(key == "ArrowDown" && players[i]['id'] == id && players[i]['direction'].toString() != [0,-1].toString()|| key.toLowerCase() == "s" && players[i]['id'] == id && players[i]['direction'].toString() != [0,-1].toString()) {
-            players[i]['direction'] = [0, 1]
-        }
-        if(key == "ArrowLeft" && players[i]['id'] == id && players[i]['direction'].toString() != [1,0].toString()|| key.toLowerCase() == "a" && players[i]['id'] == id && players[i]['direction'].toString() != [1,0].toString()) {
-            players[i]['direction'] = [-1, 0]
-        }
-        if(key == "ArrowRight" && players[i]['id'] == id && players[i]['direction'].toString() != [-1,0].toString()|| key.toLowerCase() == "d" && players[i]['id'] == id && players[i]['direction'].toString() != [-1,0].toString()) {
-            players[i]['direction'] = [1, 0]
-        }
-    }
-}
+
 
 function Snake(id) {
     this.body = [[10,10],[10,10],[10,10]]
