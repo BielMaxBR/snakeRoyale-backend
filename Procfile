@@ -1,2 +1,2 @@
-web: node start
-node start
+web: npm start
+npm start
