@@ -1,6 +1,6 @@
 var online = false
 var socket = io()
-var bpm = 600, nick, player
+var bpm = 1200, nick, player
 var canvas, ctx, WIDTH, HEIGHT, tileSize;
 
 window.addEventListener("keydown", keyDown)
@@ -11,9 +11,9 @@ $('form').submit(function(e) {
         // socket.emit("ready", ($('#nick').val()))
         nick = $('#nick').val()
         online = true
-        console.log(nick)
+        // console.log(nick)
         if (online) {
-            console.log("online")
+            // console.log("online")
         }
     }
     })
@@ -34,7 +34,7 @@ function Player(nick) {
 
 function keyDown(e) {
     if (online) {
-        console.log(e.key)
+        // console.log(e.key)
         if(e.key == "ArrowUp"  && player.direction.toString() != [0,1].toString()|| e.key.toLowerCase() == "w" && player.direction.toString() != [0,1].toString()) {
             player.direction = [0, -1]
         }
@@ -75,17 +75,21 @@ function resizeWindow() {
 
 function playerDraw(body) {
     ctx.fillStyle = "#f5c402"
-    for (var f = 0; f < body.length; f++) {
+    for (var f = 1; f < body.length; f++) {
         ctx.fillRect(
             body[f][0]*tileSize,
             body[f][1]*tileSize,
             tileSize,
             tileSize)
             }
+    ctx.fillStyle = "#fff"
+    ctx.fillRect(body[0][0]*tileSize,
+            body[0][1]*tileSize,
+            tileSize,
+            tileSize)
 }
 function Draw(players) {
     ctx.fillStyle = "#000"
-    ctx.clearRect(0 ,0 ,500, 500)
     for (var i = 0; i < players.length; i++) {
         if (players[i]['nick'] != nick) {
             for (var f = 0; f < players[i]['body'].length; f++) {
@@ -94,21 +98,46 @@ function Draw(players) {
                         players[i]['body'][f][1]*tileSize,
                         tileSize,
                         tileSize)
+                    }
+                }
             }
+            
+            
         }
-    }
-    playerDraw(player['body'])
-
- }
-
+        
 function update() {
+    ctx.clearRect(0 ,0 ,500, 500)
     socket.on('players', (players) => {
+        console.log(players)
         Draw(players)
     })
+    PlayerMove()
+    playerDraw(player['body'])
     socket.emit('playerMove', player)
-    console.log(player)
+    // console.log(player)
 }
  
+function PlayerMove() {
+    var nextPos = [player['body'][0][0] + player['direction'][0],player['body'][0][1] + player['direction'][1]]
+        
+        
+        player['body'].pop()
+        player['body'].splice(0,0, nextPos)
+
+        if (player['body'][0][0] < 0) {
+            player['body'][0][0] = canvas.width/tileSize
+        }
+        if (player['body'][0][0] > canvas.width/tileSize+1) {
+            player['body'][0][0] = 0
+        }
+        if (player['body'][0][1] < 0) {
+            player['body'][0][1] = canvas.height/tileSize
+        }
+        if (player['body'][0][1] > canvas.height/tileSize+1) {
+            player['body'][0][1] = 0
+        }
+}
+
 function run() {
     if (online) {
         if (player === undefined) {

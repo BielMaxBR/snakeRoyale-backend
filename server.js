@@ -3,7 +3,7 @@ const path = require('path')
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
-var players = [], bpm = 600
+var players = []
 app.use(express.static(path.join(__dirname, "public")))
 
 io.on('connection', (socket) => {
@@ -16,20 +16,22 @@ io.on('connection', (socket) => {
     socket.on('playerMove', (player) => {
         if (players.length == 0) {
             players.push(player)
-            // console.log(players)
+            console.log('criando o primeiro player')
         }
         else {
             for (var i = 0;i < players.length; i++) {
                 if (players[i]['nick'] != player['nick']) {
                     players.push(player)
-                    // console.log(players)
+                    console.log(players.length)
                 }
-                else {
-                    players[i] = player
-                    console.log(players[i]['direction'])
-                }
+        //         else {
+            //             players[i] = player
+        //             console.log('update de um player')
+        //         }
             }
         }
+        Update()
+        console.log(players)
     })
 
     socket.on('disconnect', () => {
@@ -37,20 +39,18 @@ io.on('connection', (socket) => {
             for (var i = 0; i < players.length; i++) {
                 if(players[i]['id'] == socket.id) {
                     players.splice(i, 1)
+                    console.log('removendo um player')
                 }
             }
-            console.log(players)
     })
 })
 
-function CreatePlayer(player) {
-    players.push(player)
-}
 
 
 
 function Update() {
     io.emit('players', players)
+    setTimeout(()=>{}, 60/600*1000)
     // for (var i = 0; i < players.length;i++) {
     //     // for (var f = 0; f < players[i]['body'].length;f++) {
     //         var nextPos = [players[i]['body'][0][0] + players[i]['direction'][0],players[i]['body'][0][1] + players[i]['direction'][1]]
@@ -73,13 +73,13 @@ function Update() {
     // }
     // console.log(players)
 }
-function run() {
-    Update()
+// function run() {
+//     Update()
 
-    setTimeout(run, (60/bpm)*1000)
-}
-function init() {
-    run()
-}
-init()
+//     setTimeout(run, (60/bpm)*1000)
+// }
+// function init() {
+//     // run()
+// }
+// init()
 server.listen(process.env.PORT || 3000)
