@@ -3,7 +3,7 @@ const path = require('path')
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
-var players = []
+var players = [], up
 app.use(express.static(path.join(__dirname, "public")))
 
 io.on('connection', (socket) => {
@@ -20,18 +20,21 @@ io.on('connection', (socket) => {
         }
         else {
             for (var i = 0;i < players.length; i++) {
-                if (players[i]['nick'] != player['nick']) {
-                    players.push(player)
-                    console.log(players.length)
-                }
-        //         else {
-            //             players[i] = player
-        //             console.log('update de um player')
-        //         }
+                if (players[i]['nick'] == player['nick']) {
+                    players[i] = player
+                    up = true
+                    break
+                }             
             }
+            if (!up) {
+                players.push(player)
+            }
+            up = false
         }
         Update()
-        console.log(players)
+        
+        console.log(players.length)
+        
     })
 
     socket.on('disconnect', () => {
@@ -40,6 +43,7 @@ io.on('connection', (socket) => {
                 if(players[i]['id'] == socket.id) {
                     players.splice(i, 1)
                     console.log('removendo um player')
+                    break
                 }
             }
     })
