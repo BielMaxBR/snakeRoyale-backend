@@ -4,43 +4,131 @@ const ctx = screen.getContext('2d')
 function CreateGame() {
     const state = {
         players: {
-            "player1": [
-                [
-                    [10,10],
-                    [10,11],
-                    [10,12]
+            "player1": {
+                body: [
+                    {
+                        x:10,
+                        y:10
+                    },{
+                        x:10,
+                        y:11
+                    },{
+                        x:10,
+                        y:12
+                    }
                 ],
-                 [0,-1]
-                ]
-        }
-    }
-    function MovePlayer(command) {
-        const key = command.keyPressed
-        if (key == "w") {
-            state.players["player1"][0][0][1] -= 1
-            if (state.players["player1"][0][0][1] == -1) {
-                state.players["player1"][0][0][1] = screen.width
+                direction: [0,-1]
             }
         }
     }
+    function PlayerDirection(command) {
+        const key = command.keyPressed
+        const player = command.playerId
 
+        
+        const acceptedMoves = {
+            ArrowUp(player) {
+                state.players[player].direction = [0,-1]
+            },
+            W(player) {
+                state.players[player].direction = [0,-1]
+            },
+            w(player) {
+                state.players[player].direction = [0,-1]
+            },
+            ArrowLeft(player) {
+                state.players[player].direction = [-1,0]              
+            },
+            A(player) {
+                state.players[player].direction = [-1,0]
+            },
+            a(player) {
+                state.players[player].direction = [-1,0]
+            },
+            ArrowDown(player) {
+                state.players[player].direction = [0, 1]
+            },
+            S(player) {
+                state.players[player].direction = [0, 1]
+            },
+            s(player) {
+                state.players[player].direction = [0, 1]
+            },
+            ArrowRight(player) {
+                state.players[player].direction = [1, 0]
+            },
+            D(player) {
+                state.players[player].direction = [1, 0]
+            },
+            d(player) {
+                state.players[player].direction = [1, 0]
+            },
+        }
+        const MoveFunction = acceptedMoves[key]
+        if (MoveFunction){
+            MoveFunction(player)
+        }
+    }
+    function MovePlayer() {
+        var nextPos = {
+            x: game.state.players["player1"].body[0].x + game.state.players["player1"].direction[0],
+            y: game.state.players["player1"].body[0].y + game.state.players["player1"].direction[1]
+        }
+    
+        console.log(nextPos)
+        console.log(game.state.players["player1"].direction[0])
+        
+        game.state.players["player1"].body.pop()
+        game.state.players["player1"].body.splice(0,0, nextPos)
+        
+        setTimeout(Run, 60/1200*1000)
+        
+    }
     return {
         MovePlayer,
+        PlayerDirection,
         state
     }
 }
 const game = CreateGame()
+const keyboardListener = CreateKeyboardListener()
+keyboardListener.subscribe(game.PlayerDirection)
 
-document.addEventListener("keydown", handleKeyDown)
+function CreateKeyboardListener() {
+    const state = {
+        observers: []
+    }
 
-function handleKeyDown(e) {
-    const key = e.key
-    const command = {
-        playerId: "player1",
-        keyPressed: key
+    function subscribe(observerFunction) {
+        state.observers.push(observerFunction)
     }
     
-    game.MovePlayer(command)
+    function notifyAll(command) {
+        for (const observerFunction of state.observers) {
+            observerFunction(command)
+            
+        }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+
+    function handleKeyDown(e) {
+        const key = e.key
+        const command = {
+            playerId: "player1",
+            keyPressed: key
+        }
+        
+        notifyAll(command)
+    }
+    return {
+        subscribe
+    }
+
+}
+
+function Run() {
+    game.MovePlayer()
+    Draw()
 }
 
 function Draw() {
@@ -49,14 +137,11 @@ function Draw() {
     for (playerId in game.state.players) {
         const player = game.state.players[playerId]
         ctx.fillStyle = "#fff"
-        // console.log(player)
-        for(block in player[0]) {
-            const blocks = player[0][block]  
-            // console.log(block)         
-            ctx.fillRect(blocks[0],blocks[1],1,1)
+        for(block of player.body) {
+            ctx.fillRect(block.x,block.y,1,1)
         }
     }
 
     requestAnimationFrame(Draw)
 }
-Draw()
+Run()
