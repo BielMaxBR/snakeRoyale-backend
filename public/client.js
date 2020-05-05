@@ -44,18 +44,25 @@ function CreateGame() {
         delete state.fruits[fruitId]
     }
 
-    function checkForFruitCollision() {
-        for (const playerId in state.players) {
-            const player = state.players[playerId]
+    function checkForFruitCollision(playerId) {
+        const player = state.players[playerId]
 
-            for(const fruitId in state.fruits) {
-                const fruit = state.fruits[fruitId]
+        for(const fruitId in state.fruits) {
+            const fruit = state.fruits[fruitId]
 
-                if (player.body[0].x === fruit.x &&player.body[0].y === fruit.y ) {
-                    console.log("bateu!!")
-                }
+            if (player.body[0].x === fruit.x &&player.body[0].y === fruit.y ) {
+                console.log("bateu!!")
+
+                removeFruit({ fruitId: fruitId })
+                playerIncrease(playerId)
             }
         }
+    
+    }
+
+    function playerIncrease(playerId) {
+        const player = state.players[playerId]
+        player.body.splice(0,0,player.body[0])
     }
 
     function PlayerDirection(command) {
@@ -140,8 +147,10 @@ function CreateGame() {
             back()
         }
         LocalMove()
-        function back() {
-            checkForFruitCollision()
+        function back() {            
+            const playerId = command.playerId
+
+            checkForFruitCollision(playerId)
             setTimeout(LocalMove, 60/1200*1000)
         }
     }
