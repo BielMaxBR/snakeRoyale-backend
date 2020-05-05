@@ -3,24 +3,61 @@ const ctx = screen.getContext('2d')
 
 function CreateGame() {
     const state = {
-        players: {
-            "player1": {
-                body: [
-                    {
-                        x:10,
-                        y:10
-                    },{
-                        x:10,
-                        y:11
-                    },{
-                        x:10,
-                        y:12
-                    }
-                ],
-                direction: [0,-1]
+        players: {},
+        fruits: {}
+    }
+    
+
+    function addPlayer(command) {
+        const playerId = command.playerId
+        const playerBody = command.body
+        const playerDirection = command.direction
+
+        state.players[playerId] = {
+                playerId: playerId,
+                body: playerBody,
+                direction: playerDirection
+        }
+    }
+
+    function removePlayer(command) {
+        const playerId = command.playerId
+
+        delete state.players[playerId]
+    }
+
+    function addFruit(command) {
+        const fruitId = command.fruitId
+        const fruitX = command.fruitX
+        const fruitY = command.fruitY
+
+        state.fruits[fruitId] = {
+                fruitId: fruitId,
+                x: fruitX,
+                y: fruitY
+        }
+    }
+
+    function removeFruit(command) {
+        const fruitId = command.fruitId
+
+        delete state.fruits[fruitId]
+    }
+
+    function checkForFruitCollision() {
+        for (const playerId in state.players) {
+            const player = state.players[playerId]
+
+            for(const fruitId in state.fruits) {
+                const fruit = state.fruits[fruitId]
+
+                if (player.body[0].x === fruit.x &&player.body[0].y === fruit.y ) {
+                    console.log("bateu!!")
+                }
             }
         }
     }
+
     function PlayerDirection(command) {
         const key = command.keyPressed
         const player = command.playerId
@@ -64,27 +101,55 @@ function CreateGame() {
                 state.players[player].direction = [1, 0]
             },
         }
-        const MoveFunction = acceptedMoves[key]
-        if (MoveFunction){
-            MoveFunction(player)
+        const DirectionFunction = acceptedMoves[key]
+        if (player && DirectionFunction){
+            DirectionFunction(player)
         }
     }
-    function MovePlayer() {
-        var nextPos = {
-            x: game.state.players["player1"].body[0].x + game.state.players["player1"].direction[0],
-            y: game.state.players["player1"].body[0].y + game.state.players["player1"].direction[1]
+    function MovePlayer(command) {
+        function LocalMove() {
+            const playerId = command.playerId
+            const playerBody = game.state.players[playerId].body
+            const playerDirection = game.state.players[playerId].direction
+            var nextPos = {
+                x: playerBody[0].x + playerDirection[0],
+                y: playerBody[0].y + playerDirection[1]
+            }
+        
+         
+            playerBody.pop()
+            playerBody.splice(0,0, nextPos)
+
+            if (playerBody[0].x > screen.width-1) {
+                playerBody[0].x = 0
+            }
+            if (playerBody[0].x < 0) {
+                playerBody[0].x = screen.width
+            }
+            if (playerBody[0].y > screen.height-1) {
+                playerBody[0].y = 0
+            }
+            if (playerBody[0].y < 0) {
+                playerBody[0].y = screen.height
+            }
+
+            if (nextPos.x == playerBody[1].x && nextPos.y == playerBody[1].y) {
+                nextPos = [playerBody[0].x + this.direction[0]*-1,playerBody[0].y + this.direction[1]*-1]
+            }
+
+            back()
         }
-    
-        console.log(nextPos)
-        console.log(game.state.players["player1"].direction[0])
-        
-        game.state.players["player1"].body.pop()
-        game.state.players["player1"].body.splice(0,0, nextPos)
-        
-        setTimeout(Run, 60/1200*1000)
-        
+        LocalMove()
+        function back() {
+            checkForFruitCollision()
+            setTimeout(LocalMove, 60/1200*1000)
+        }
     }
     return {
+        removeFruit,
+        addFruit,
+        removePlayer,
+        addPlayer,
         MovePlayer,
         PlayerDirection,
         state
@@ -117,7 +182,7 @@ function CreateKeyboardListener() {
             playerId: "player1",
             keyPressed: key
         }
-        
+        console.log(command)
         notifyAll(command)
     }
     return {
@@ -127,7 +192,12 @@ function CreateKeyboardListener() {
 }
 
 function Run() {
-    game.MovePlayer()
+    for (player in game.state.players) {
+        if (game.state.players != {} && player) {
+            console.log(game.state.players[player])
+            game.MovePlayer(game.state.players[player])
+        }
+    }
     Draw()
 }
 
@@ -136,12 +206,22 @@ function Draw() {
 
     for (playerId in game.state.players) {
         const player = game.state.players[playerId]
-        ctx.fillStyle = "#fff"
+        ctx.fillStyle = "white"
         for(block of player.body) {
             ctx.fillRect(block.x,block.y,1,1)
         }
     }
 
+    for (fruitId in game.state.fruits) {
+        const fruit = game.state.fruits[fruitId]
+        ctx.fillStyle = "white"
+        ctx.fillRect(fruit.x,fruit.y,1,1)
+    }
+
+
     requestAnimationFrame(Draw)
 }
+game.addPlayer({playerId: "player1", body:[{x:10,y:10},{x:10,y:10},{x:10,y:10}], direction: [1,0]})
+game.addFruit({fruitId: "fruit1", fruitX: 14, fruitY: 14})
 Run()
+
