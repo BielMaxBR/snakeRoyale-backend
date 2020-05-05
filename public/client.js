@@ -52,8 +52,9 @@ function CreateGame() {
 
             if (player.body[0].x === fruit.x &&player.body[0].y === fruit.y ) {
                 console.log("bateu!!")
-
+                const coinAudio = document.querySelector('audio')
                 removeFruit({ fruitId: fruitId })
+                coinAudio.play()
                 playerIncrease(playerId)
             }
         }
@@ -72,40 +73,65 @@ function CreateGame() {
         
         const acceptedMoves = {
             ArrowUp(player) {
-                state.players[player].direction = [0,-1]
+                if(state.players[player].direction.toString() != [0,1].toString()) {
+                    state.players[player].direction = [0,-1]
+                }
             },
             W(player) {
-                state.players[player].direction = [0,-1]
+                if(state.players[player].direction.toString() != [0,1].toString()) {
+                    state.players[player].direction = [0,-1]
+                }
             },
             w(player) {
-                state.players[player].direction = [0,-1]
+                if(state.players[player].direction.toString() != [0,1].toString()) {
+                    state.players[player].direction = [0,-1]
+                }
             },
             ArrowLeft(player) {
-                state.players[player].direction = [-1,0]              
+                if(state.players[player].direction.toString() != [1,0].toString()) {
+                    state.players[player].direction = [-1,0] 
+                }             
             },
             A(player) {
-                state.players[player].direction = [-1,0]
+                if(state.players[player].direction.toString() != [1,0].toString()) {
+               
+                    state.players[player].direction = [-1,0]
+                }
             },
             a(player) {
-                state.players[player].direction = [-1,0]
+                if(state.players[player].direction.toString() != [1,0].toString()) {
+                    state.players[player].direction = [-1,0]
+                }
             },
             ArrowDown(player) {
-                state.players[player].direction = [0, 1]
+                if(state.players[player].direction.toString() != [0,-1].toString()) {
+                    state.players[player].direction = [0, 1]
+                }
             },
             S(player) {
-                state.players[player].direction = [0, 1]
+                if(state.players[player].direction.toString() != [0,-1].toString()) {
+                    state.players[player].direction = [0, 1]
+                }
             },
             s(player) {
-                state.players[player].direction = [0, 1]
+                if(state.players[player].direction.toString() != [0,-1].toString()) {
+                    state.players[player].direction = [0, 1]
+                }
             },
             ArrowRight(player) {
-                state.players[player].direction = [1, 0]
+                if(state.players[player].direction.toString() != [-1,0].toString()) {
+                    state.players[player].direction = [1, 0]
+                }
             },
             D(player) {
-                state.players[player].direction = [1, 0]
+                if(state.players[player].direction.toString() != [-1,0].toString()) {
+                    state.players[player].direction = [1, 0]
+                }
             },
             d(player) {
-                state.players[player].direction = [1, 0]
+                if(state.players[player].direction.toString() != [-1,0].toString()) {
+                    state.players[player].direction = [1, 0]
+                }
             },
         }
         const DirectionFunction = acceptedMoves[key]
