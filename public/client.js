@@ -42,27 +42,12 @@ socket.on('direct-player', (command) => {
 
 socket.on('add-fruit', (command) => {
     game.addFruit(command)
-    console.log('client')
+    // console.log('client')
 })
 
 socket.on('remove-fruit', (command) => {
     game.removeFruit(command)
 })
 
-socket.on("move-player", (command) => {
-    game.MovePlayer(command)
-})
 
-
-function Run() {
-    for (const player in game.state.players) {
-        if (game.state.players != {} && player) {
-            game.MovePlayer(game.state.players[player])
-        }
-    }
-}
-
-
-
-Run()
 

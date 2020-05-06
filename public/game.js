@@ -17,12 +17,6 @@ export default function CreateGame() {
         setInterval(addFruit, frequency)
     }
 
-    function MoveLoop() {
-        const segundos = 0.2
-        const frequency = segundos*1000
-
-        setInterval(MovePlayer, frequency)
-    }
 
     function subscribe(observerFunction) {
         observers.push(observerFunction)
@@ -144,9 +138,11 @@ export default function CreateGame() {
         const player = state.players[playerId]
         player.body.splice(0,0,player.body[0])
     }
-
+    
     function PlayerDirection(command) {
+        console.log('vai direcionar o player')
         notifyAll(command)
+        // console.log(command)
         const key = command.keyPressed
         const player = command.playerId
 
@@ -220,43 +216,43 @@ export default function CreateGame() {
         
     }
     function MovePlayer(command) {
-            const playerId = command.playerId
-            const playerBody = command.body
-            const playerDirection = command.direction
+        // notifyAll(command)
+        const playerId = command.playerId
+        const playerBody = command.body
+        const playerDirection = command.direction
 
-            var nextPos = {
-                x: playerBody[0].x + playerDirection[0],
-                y: playerBody[0].y + playerDirection[1]
-            }
+        var nextPos = {
+            x: playerBody[0].x + playerDirection[0],
+            y: playerBody[0].y + playerDirection[1]
+        }
 
-            playerBody.pop()
-            playerBody.splice(0,0, nextPos)
+        playerBody.pop()
+        playerBody.splice(0,0, nextPos)
 
-            if (playerBody[0].x > state.screen.width-1) {
-                playerBody[0].x = 0
-            }
-            if (playerBody[0].x < 0) {
-                playerBody[0].x = state.screen.width
-            }
-            if (playerBody[0].y > state.screen.height-1) {
-                playerBody[0].y = 0
-            }
-            if (playerBody[0].y < 0) {
-                playerBody[0].y = state.screen.height
-            }
+        if (playerBody[0].x > state.screen.width-1) {
+            playerBody[0].x = 0
+        }
+        if (playerBody[0].x < 0) {
+            playerBody[0].x = state.screen.width
+        }
+        if (playerBody[0].y > state.screen.height-1) {
+            playerBody[0].y = 0
+        }
+        if (playerBody[0].y < 0) {
+            playerBody[0].y = state.screen.height
+        }
 
-            if (nextPos.x == playerBody[1].x && nextPos.y == playerBody[1].y) {
-                nextPos = [playerBody[0].x + this.direction[0]*-1,playerBody[0].y + this.direction[1]*-1]
-            }
-        
-        console.log(`${playerId} se mecheu`)        
-        // checkForFruitCollision(playerId)
-        notifyAll({
-            type: 'move-player',
-            playerId: playerId,
+        if (nextPos.x == playerBody[1].x && nextPos.y == playerBody[1].y) {
+            nextPos = [playerBody[0].x + this.direction[0]*-1,playerBody[0].y + this.direction[1]*-1]
+        }
+        state.players[playerId] = {
+            playerId : playerId,
             body: playerBody,
             direction: playerDirection
-        })
+        }
+    
+    console.log(`${playerId} se mecheu`)        
+    // checkForFruitCollision(playerId)
     }
     return {
         PlayerDirection,
@@ -265,8 +261,7 @@ export default function CreateGame() {
         fruitSpawn,
         MovePlayer,
         addPlayer,
-        subscribe,
-        MoveLoop,
+        subscribe,      
         addFruit,
         setState,
         state,
