@@ -10,6 +10,20 @@ export default function CreateGame() {
     
     const observers = []
 
+    function fruitSpawn() {
+        const segundos = 10
+        const frequency = segundos*1000
+
+        setInterval(addFruit, frequency)
+    }
+
+    function MoveLoop() {
+        const segundos = 0.2
+        const frequency = segundos*1000
+
+        setInterval(MovePlayer, frequency)
+    }
+
     function subscribe(observerFunction) {
         observers.push(observerFunction)
     }
@@ -47,8 +61,6 @@ export default function CreateGame() {
             else if (Loteria == 4) {
                 return [0,1]
             }
-
-
         }
         
         const x = Math.floor(Math.random() * state.screen.width)
@@ -82,21 +94,33 @@ export default function CreateGame() {
     }
 
     function addFruit(command) {
-        const fruitId = command.fruitId
-        const fruitX = command.fruitX
-        const fruitY = command.fruitY
+        const fruitId = command ? command.fruitId : Math.floor(Math.random() * 1000000000000000000000)
+        const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width)
+        const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.height)
 
         state.fruits[fruitId] = {
                 fruitId: fruitId,
                 x: fruitX,
                 y: fruitY
         }
+
+        notifyAll({
+            type: 'add-fruit',
+            fruitId: fruitId,
+            fruitX: fruitX,
+            fruitY: fruitY
+        })
     }
 
     function removeFruit(command) {
         const fruitId = command.fruitId
 
         delete state.fruits[fruitId]
+
+        notifyAll({
+            type: 'remove-fruit',
+            fruitId: fruitId
+        })
     }
 
     function checkForFruitCollision(playerId) {
@@ -105,7 +129,7 @@ export default function CreateGame() {
         for(const fruitId in state.fruits) {
             const fruit = state.fruits[fruitId]
 
-            if (player.body[0].x === fruit.x &&player.body[0].y === fruit.y ) {
+            if (player.body[0].x === fruit.x && player.body[0].y === fruit.y ) {
                 console.log("bateu!!")
                 const coinAudio = document.querySelector('audio')
                 removeFruit({ fruitId: fruitId })
@@ -122,6 +146,7 @@ export default function CreateGame() {
     }
 
     function PlayerDirection(command) {
+        notifyAll(command)
         const key = command.keyPressed
         const player = command.playerId
 
@@ -192,20 +217,18 @@ export default function CreateGame() {
         if (player && DirectionFunction){
             DirectionFunction(player)
         }
-        console.log(state.players[player].direction)
-
+        
     }
     function MovePlayer(command) {
-        function LocalMove() {
             const playerId = command.playerId
-            const playerBody = state.players[playerId].body
-            const playerDirection = state.players[playerId].direction
+            const playerBody = command.body
+            const playerDirection = command.direction
+
             var nextPos = {
                 x: playerBody[0].x + playerDirection[0],
                 y: playerBody[0].y + playerDirection[1]
             }
-        
-         
+
             playerBody.pop()
             playerBody.splice(0,0, nextPos)
 
@@ -225,26 +248,27 @@ export default function CreateGame() {
             if (nextPos.x == playerBody[1].x && nextPos.y == playerBody[1].y) {
                 nextPos = [playerBody[0].x + this.direction[0]*-1,playerBody[0].y + this.direction[1]*-1]
             }
-
-            back()
-        }
-        LocalMove()
-        function back() {            
-            const playerId = command.playerId
-
-            checkForFruitCollision(playerId)
-            setTimeout(LocalMove, 60/1200*1000)
-        }
+        
+        console.log(`${playerId} se mecheu`)        
+        // checkForFruitCollision(playerId)
+        notifyAll({
+            type: 'move-player',
+            playerId: playerId,
+            body: playerBody,
+            direction: playerDirection
+        })
     }
     return {
-        removeFruit,
-        addFruit,
-        removePlayer,
-        addPlayer,
-        MovePlayer,
         PlayerDirection,
+        removePlayer,
+        removeFruit,
+        fruitSpawn,
+        MovePlayer,
+        addPlayer,
         subscribe,
+        MoveLoop,
+        addFruit,
         setState,
-        state
+        state,
     }
 }

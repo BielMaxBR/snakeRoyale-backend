@@ -23,6 +23,7 @@ export default function CreateKeyboardListener(document) {
     function handleKeyDown(e) {
         const key = e.key
         const command = {
+            type: 'direct-player',
             playerId: state.playerId,
             keyPressed: key
         }
