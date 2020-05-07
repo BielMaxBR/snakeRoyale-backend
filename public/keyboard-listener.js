@@ -21,7 +21,7 @@ export default function CreateKeyboardListener(document) {
     document.addEventListener("keydown", handleKeyDown)
 
     function handleKeyDown(e) {
-        console.log('apertou um botão')
+        // console.log('apertou um botão')
         const key = e.key
         const command = {
             type: 'direct-player',

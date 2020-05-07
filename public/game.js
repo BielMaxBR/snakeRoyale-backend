@@ -11,10 +11,21 @@ export default function CreateGame() {
     const observers = []
 
     function fruitSpawn() {
-        const segundos = 10
+        const segundos = 4
         const frequency = segundos*1000
 
         setInterval(addFruit, frequency)
+    }
+
+    function MoveLoop() {  
+        setInterval(() => {
+            if (state.players.length != {}) {
+            for(const playerId in state.players) {
+                const player = state.players[playerId]
+                MovePlayer(player)
+            }
+        }
+        }, 100)
     }
 
 
@@ -119,15 +130,16 @@ export default function CreateGame() {
 
     function checkForFruitCollision(playerId) {
         const player = state.players[playerId]
-
         for(const fruitId in state.fruits) {
             const fruit = state.fruits[fruitId]
-
-            if (player.body[0].x === fruit.x && player.body[0].y === fruit.y ) {
-                console.log("bateu!!")
-                const coinAudio = document.querySelector('audio')
+            
+            if (player.body[1].x === fruit.x && player.body[1].y === fruit.y ) {
+                notifyAll({
+                    type:'collision-fruit',
+                    playerId: playerId
+                })
+                
                 removeFruit({ fruitId: fruitId })
-                coinAudio.play()
                 playerIncrease(playerId)
             }
         }
@@ -140,7 +152,7 @@ export default function CreateGame() {
     }
     
     function PlayerDirection(command) {
-        console.log('vai direcionar o player')
+
         notifyAll(command)
         // console.log(command)
         const key = command.keyPressed
@@ -216,18 +228,25 @@ export default function CreateGame() {
         
     }
     function MovePlayer(command) {
-        // notifyAll(command)
+
         const playerId = command.playerId
         const playerBody = command.body
         const playerDirection = command.direction
-
+        // console.log(playerBody, 'começo')
+        
+        notifyAll({
+            type: 'move-player',
+            playerId : playerId,
+            body: playerBody,
+            direction: playerDirection
+        })
         var nextPos = {
-            x: playerBody[0].x + playerDirection[0],
-            y: playerBody[0].y + playerDirection[1]
+            x: state.players[playerId].body[0].x + state.players[playerId].direction[0],
+            y: state.players[playerId].body[0].y + state.players[playerId].direction[1]
+            
         }
-
         playerBody.pop()
-        playerBody.splice(0,0, nextPos)
+        playerBody.splice(1,0, nextPos)
 
         if (playerBody[0].x > state.screen.width-1) {
             playerBody[0].x = 0
@@ -242,17 +261,20 @@ export default function CreateGame() {
             playerBody[0].y = state.screen.height
         }
 
-        if (nextPos.x == playerBody[1].x && nextPos.y == playerBody[1].y) {
-            nextPos = [playerBody[0].x + this.direction[0]*-1,playerBody[0].y + this.direction[1]*-1]
+        if (nextPos.x == playerBody[2].x && nextPos.y == playerBody[2].y) {
+            nextPos = [playerBody[1].x + playerDirection[0]*-1,playerBody[1].y + playerDirection[1]*-1]
         }
-        state.players[playerId] = {
+
+        const newDirection = {
+            type: 'move-player',
             playerId : playerId,
             body: playerBody,
             direction: playerDirection
         }
-    
-    console.log(`${playerId} se mecheu`)        
-    // checkForFruitCollision(playerId)
+        state.players[playerId] = newDirection
+        
+        // console.log(playerBody , 'final')
+        checkForFruitCollision(playerId)
     }
     return {
         PlayerDirection,
@@ -261,7 +283,8 @@ export default function CreateGame() {
         fruitSpawn,
         MovePlayer,
         addPlayer,
-        subscribe,      
+        subscribe,
+        MoveLoop, 
         addFruit,
         setState,
         state,

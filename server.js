@@ -12,12 +12,12 @@ app.use(express.static("public"))
 const game = CreateGame()
 
 game.fruitSpawn()
-
+game.MoveLoop()
 
 
 game.subscribe((command) => {
     sockets.emit(command.type, command)
-    console.log('recebeu e mandou de volta algo', `${command.type}`)
+    // consoleconsole.log('recebeu e mandou de volta algo', `${command.type}`)
     // console.log(command)
 })
 sockets.on('connection', (socket) => {
@@ -31,7 +31,7 @@ sockets.on('connection', (socket) => {
     })
 
     socket.on('direct-player', (command) => {
-        console.log('recebe e manda pro resto a direção')
+        // console.log('recebe e manda pro resto a direção')
         command.playerId = playerId
         command.type = 'direct-player'
 

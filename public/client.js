@@ -34,7 +34,7 @@ socket.on('remove-player', (command) => {
 
 socket.on('direct-player', (command) => {
     const playerId = socket.id
-
+    // console.log('virou')
     if (playerId !== command.playerId) {
         game.PlayerDirection(command)
     }
@@ -47,6 +47,14 @@ socket.on('add-fruit', (command) => {
 
 socket.on('remove-fruit', (command) => {
     game.removeFruit(command)
+})
+
+socket.on('move-player', (command) => {
+    game.MovePlayer(command)
+})
+socket.on('collision-fruit', () => {
+    const coinAudio = document.querySelector('audio')
+    coinAudio.play()
 })
 
 
