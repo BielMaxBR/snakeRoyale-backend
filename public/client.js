@@ -1,58 +1,61 @@
-var online = false
-var socket = io()
-$('form').submit(function(e) {
-    e.preventDefault()
-    if (!online) {
-            socket.emit("ready", () => {
-        });        
-        online = true
-    }
-    })
-var canvas, ctx, WIDTH, HEIGHT, tileSize;
-window.addEventListener("keydown", keyDown)
+import CreateKeyboardListener from './keyboard-listener.js'
+import CreateGame from './game.js'
+import Draw from './draw.js'
 
-function keyDown(e) {
-    console.log(e.key)
-    socket.emit("keyInput", e.key)
-}
-function init() {
-    canvas = document.createElement("canvas")
-    resizeWindow()
-    document.body.appendChild(canvas)
-    ctx = canvas.getContext("2d");
-    
-    // newGame()
-    // frisk.update()
-    // run()
-}
+const socket = io()
 
-function resizeWindow() {
-    WIDTH = window.innerWidth
-    HEIGHT = window.innerHeight
-    
-    canvas.width = 500
-    canvas.height = 500
+const game = CreateGame()
+const keyboardListener = CreateKeyboardListener(document)
 
-    tileSize = 10
-}
-
-socket.on('players', (players) => {
-    Draw(players)
+socket.on('connect', () => {
+    const playerId = socket.id
+    const screen = document.getElementById("screen")
+    Draw(screen, game, requestAnimationFrame, playerId)
 })
-function Draw(players) {
-    ctx.fillStyle = "#000"
-    ctx.clearRect(0 ,0 ,500, 500)
-    for (var i = 0; i < players.length; i++) {
-        for (var f = 0; f < players[i]['body'].length; f++) {
-                ctx.fillRect(
-                    players[i]['body'][f][0]*tileSize,
-                    players[i]['body'][f][1]*tileSize,
-                    tileSize,
-                    tileSize)
-                
-        }
-            
+
+socket.on('setup', (state) => {
+    const playerId = socket.id
+    game.setState(state)
+
+    keyboardListener.registerPlayerId(playerId)
+    keyboardListener.subscribe(game.PlayerDirection)
+    keyboardListener.subscribe((command) =>{
+        socket.emit('direct-player', command)
+    })
+})
+
+socket.on('add-player', (command) => {
+    game.addPlayer(command)
+})
+
+socket.on('remove-player', (command) => {
+    game.removePlayer(command)
+})
+
+socket.on('direct-player', (command) => {
+    const playerId = socket.id
+    // console.log('virou')
+    if (playerId !== command.playerId) {
+        game.PlayerDirection(command)
     }
- }
-    
-    init()
+})
+
+socket.on('add-fruit', (command) => {
+    game.addFruit(command)
+    // console.log('client')
+})
+
+socket.on('remove-fruit', (command) => {
+    game.removeFruit(command)
+})
+
+socket.on('move-player', (command) => {
+    game.MovePlayer(command)
+})
+socket.on('collision-fruit', () => {
+    const coinAudio = document.querySelector('audio')
+    coinAudio.play()
+})
+
+
+
