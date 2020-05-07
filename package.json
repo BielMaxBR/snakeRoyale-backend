@@ -21,6 +21,10 @@
   "dependencies": {
     "express": "^4.17.1",
     "http": "0.0.1-security",
+<<<<<<< HEAD
+=======
+    "nod": "^0.2.0",
+>>>>>>> 13cd274690e30217ef5de4e5be4731d3f7dff048
     "node": "^14.2.0",
     "socket.io": "^2.3.0"
   },
