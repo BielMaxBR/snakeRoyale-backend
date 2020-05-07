@@ -34,7 +34,7 @@ socket.on('remove-player', (command) => {
 
 socket.on('direct-player', (command) => {
     const playerId = socket.id
-
+    // console.log('virou')
     if (playerId !== command.playerId) {
         game.PlayerDirection(command)
     }
@@ -42,27 +42,20 @@ socket.on('direct-player', (command) => {
 
 socket.on('add-fruit', (command) => {
     game.addFruit(command)
-    console.log('client')
+    // console.log('client')
 })
 
 socket.on('remove-fruit', (command) => {
     game.removeFruit(command)
 })
 
-socket.on("move-player", (command) => {
+socket.on('move-player', (command) => {
     game.MovePlayer(command)
+})
+socket.on('collision-fruit', () => {
+    const coinAudio = document.querySelector('audio')
+    coinAudio.play()
 })
 
 
-function Run() {
-    for (const player in game.state.players) {
-        if (game.state.players != {} && player) {
-            game.MovePlayer(game.state.players[player])
-        }
-    }
-}
-
-
-
-Run()
 
