@@ -243,7 +243,7 @@ export default function CreateGame() {
         var nextPos = {
             x: state.players[playerId].body[0].x + state.players[playerId].direction[0],
             y: state.players[playerId].body[0].y + state.players[playerId].direction[1]
-            
+             
         }
         playerBody.pop()
         playerBody.splice(1,0, nextPos)
